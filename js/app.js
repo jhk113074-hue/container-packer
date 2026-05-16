@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
         itemsTbody.innerHTML = '';
         const itemsTfoot = document.getElementById('items-tfoot');
         if (currentItems.length === 0) {
-            itemsTbody.innerHTML = '<tr class="empty-row"><td colspan="7">등록된 화물이 없습니다.</td></tr>';
+            itemsTbody.innerHTML = '<tr class="empty-row"><td colspan="8">등록된 화물이 없습니다.</td></tr>';
             if(itemsTfoot) itemsTfoot.classList.add('hidden');
         } else {
             if(itemsTfoot) itemsTfoot.classList.remove('hidden');
@@ -533,6 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${detailsDisp}
                     </td>
                     <td>${item.w} × ${item.d} × ${item.h}</td>
+                    <td>${((item.w * item.d * item.h) / 1000000000).toFixed(3)}</td>
                     <td>${netDisp} / ${grossDisp}</td>
                     <td>${item.qty.toLocaleString()}</td>
                     <td>${totalNetDisp} / ${totalGrossDisp}</td>
@@ -1220,12 +1221,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 targetCtx.textBaseline = 'middle';
                 
                 let label = `[${item.globalIndex}] ${item.name}-${item.itemIndex}`;
-                if (rw < 60) label = `[${item.globalIndex}]`;
+                if (rw < 40) label = `[${item.globalIndex}]`;
                 
+                const maxWidth = Math.max(10, rw - 8);
+                let lines = [];
+                let words = label.split(' ');
+                let currentLine = words[0];
+
+                for (let i = 1; i < words.length; i++) {
+                    let word = words[i];
+                    if (targetCtx.measureText(currentLine + " " + word).width < maxWidth) {
+                        currentLine += " " + word;
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    }
+                }
+                lines.push(currentLine);
+                
+                let finalLines = [];
+                lines.forEach(line => {
+                    if (targetCtx.measureText(line).width > maxWidth) {
+                        let tempLine = '';
+                        for (let c of line) {
+                            if (targetCtx.measureText(tempLine + c).width > maxWidth && tempLine.length > 0) {
+                                finalLines.push(tempLine);
+                                tempLine = c;
+                            } else {
+                                tempLine += c;
+                            }
+                        }
+                        if (tempLine) finalLines.push(tempLine);
+                    } else {
+                        finalLines.push(line);
+                    }
+                });
+
+                targetCtx.save();
+                targetCtx.beginPath();
+                targetCtx.rect(rx, ry, rw, rh);
+                targetCtx.clip();
+
                 targetCtx.shadowColor = 'rgba(0,0,0,0.8)';
                 targetCtx.shadowBlur = 2;
-                targetCtx.fillText(label, rx + rw/2, ry + rh/2);
+
+                const lineHeight = 12;
+                const totalHeight = finalLines.length * lineHeight;
+                let startY = ry + rh/2 - totalHeight/2 + lineHeight/2;
+
+                finalLines.forEach(line => {
+                    targetCtx.fillText(line.trim(), rx + rw/2, startY);
+                    startY += lineHeight;
+                });
+
                 targetCtx.shadowBlur = 0;
+                targetCtx.restore();
             }
         });
 
