@@ -245,23 +245,30 @@ const Packer = (function() {
         let boxes = expandItems(items);
         boxes = sortBoxes(boxes);
         
+        // Sort containers from largest to smallest by volume
+        let sortedContainerTypes = [...containerTypes].sort((a, b) => {
+            const volA = CONTAINERS[a].l * CONTAINERS[a].w * CONTAINERS[a].h;
+            const volB = CONTAINERS[b].l * CONTAINERS[b].w * CONTAINERS[b].h;
+            return volB - volA;
+        });
+
         const finalResults = [];
         let currentRemaining = boxes;
         
-        for (let i = 0; i < containerTypes.length; i++) {
+        for (let i = 0; i < sortedContainerTypes.length; i++) {
             if (currentRemaining.length === 0) {
                 // We add empty results for unused containers so the UI still shows them
                 finalResults.push({
-                    container: containerTypes[i],
-                    dimensions: CONTAINERS[containerTypes[i]],
-                    metrics: { utilizationRate: 0, loadedVolume: 0, totalVolume: CONTAINERS[containerTypes[i]].l * CONTAINERS[containerTypes[i]].w * CONTAINERS[containerTypes[i]].h / 1e9, maxWeight: CONTAINERS[containerTypes[i]].maxWeight, loadedWeight: 0, remainingWeight: CONTAINERS[containerTypes[i]].maxWeight, fragmentedCount: 0, maxContinuousVolume: 0, remainingVolume: CONTAINERS[containerTypes[i]].l * CONTAINERS[containerTypes[i]].w * CONTAINERS[containerTypes[i]].h / 1e9, topSpaces: [], maxContinuousSpaceDim: {l:0,w:0,h:0} },
+                    container: sortedContainerTypes[i],
+                    dimensions: CONTAINERS[sortedContainerTypes[i]],
+                    metrics: { utilizationRate: 0, loadedVolume: 0, totalVolume: CONTAINERS[sortedContainerTypes[i]].l * CONTAINERS[sortedContainerTypes[i]].w * CONTAINERS[sortedContainerTypes[i]].h / 1e9, maxWeight: CONTAINERS[sortedContainerTypes[i]].maxWeight, loadedWeight: 0, remainingWeight: CONTAINERS[sortedContainerTypes[i]].maxWeight, fragmentedCount: 0, maxContinuousVolume: 0, remainingVolume: CONTAINERS[sortedContainerTypes[i]].l * CONTAINERS[sortedContainerTypes[i]].w * CONTAINERS[sortedContainerTypes[i]].h / 1e9, topSpaces: [], maxContinuousSpaceDim: {l:0,w:0,h:0} },
                     loaded: [],
                     unloaded: []
                 });
                 continue;
             }
             
-            const type = containerTypes[i];
+            const type = sortedContainerTypes[i];
             const res = packInternal(type, currentRemaining, true);
             finalResults.push(res);
             currentRemaining = res.unloaded.map(u => u.box);
