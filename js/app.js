@@ -1504,6 +1504,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Populate project info
             if (data.customer) customerInput.value = data.customer;
             if (data.piNumber) {
+                projectInput.value = data.piNumber;
                 const serialInput = document.getElementById('project-serial');
                 if (serialInput) serialInput.value = data.piNumber;
             }
@@ -1572,4 +1573,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial render
     renderItems();
     renderSimulationResult();
+
+    // Iframe drag dispatcher
+    const appHeader = document.querySelector('.app-header');
+    if (appHeader) {
+        appHeader.style.cursor = 'move';
+        let isDraggingFromIframe = false;
+        let startX, startY;
+        appHeader.addEventListener('mousedown', (e) => {
+            if (e.target.closest('button')) return;
+            isDraggingFromIframe = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            window.parent.postMessage({ type: 'PACKER_DRAG_START' }, '*');
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (isDraggingFromIframe) {
+                const movementX = e.clientX - startX;
+                const movementY = e.clientY - startY;
+                startX = e.clientX;
+                startY = e.clientY;
+                window.parent.postMessage({ type: 'PACKER_DRAG_MOVE', movementX, movementY }, '*');
+            }
+        });
+        document.addEventListener('mouseup', () => {
+            if (isDraggingFromIframe) {
+                isDraggingFromIframe = false;
+                window.parent.postMessage({ type: 'PACKER_DRAG_END' }, '*');
+            }
+        });
+    }
 });
