@@ -1553,7 +1553,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (missingDimensionsCount > 0) {
                         alert(`견적서에서 ${addedCount}개의 화물을 불러왔습니다.\n\n⚠️ 주의: ${missingDimensionsCount}개의 화물은 규격(가로/세로/높이) 정보가 없습니다. 리스트 우측의 [수정(연필)] 버튼을 눌러 규격을 입력하셔야 시뮬레이션이 가능합니다.`);
                     } else {
-                        alert(`견적서에서 ${addedCount}개의 화물을 성공적으로 불러왔습니다!`);
+                        setTimeout(() => {
+                            const runBtn = document.getElementById('btn-run-simulation');
+                            if (runBtn) runBtn.click();
+                        }, 100);
                     }
                 } else {
                     alert('불러올 수 있는 화물이 없습니다.');
