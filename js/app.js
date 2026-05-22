@@ -1506,6 +1506,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.piNumber) projectInput.value = data.piNumber;
             if (data.date) dateInput.value = data.date;
             
+            // Populate containers
+            if (data.containers) {
+                if (document.getElementById('cnt_20gp')) document.getElementById('cnt_20gp').value = data.containers['20GP'] || 0;
+                if (document.getElementById('cnt_20rf')) document.getElementById('cnt_20rf').value = data.containers['20RF'] || 0;
+                if (document.getElementById('cnt_40gp')) document.getElementById('cnt_40gp').value = data.containers['40GP'] || 0;
+                if (document.getElementById('cnt_40hc')) document.getElementById('cnt_40hc').value = data.containers['40HC'] || 0;
+            }
+            
             // Populate items
             if (data.items && Array.isArray(data.items)) {
                 let addedCount = 0;
