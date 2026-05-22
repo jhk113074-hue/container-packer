@@ -1503,7 +1503,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Populate project info
             if (data.customer) customerInput.value = data.customer;
-            if (data.piNumber) projectInput.value = data.piNumber;
+            if (data.piNumber) {
+                const serialInput = document.getElementById('project-serial');
+                if (serialInput) serialInput.value = data.piNumber;
+            }
             if (data.date) dateInput.value = data.date;
             
             // Populate containers
