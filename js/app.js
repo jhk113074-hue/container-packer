@@ -1526,13 +1526,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentItems.push({
                         id: generateId(),
                         name: piItem.desc,
-                        packageType: 'Pallet', // Default
+                        packageType: piItem.packageType || 'Pallet',
                         contentDetails: piItem.remarks || '',
                         w: w, d: d, h: h,
                         netWeight: nw, grossWeight: gw, weight: gw,
                         qty: qty,
-                        stackable: true,
-                        rotation: true
+                        stackable: piItem.stackable !== undefined ? piItem.stackable : true,
+                        rotation: piItem.rotation !== undefined ? piItem.rotation : true
                     });
                     
                     if (!hasDimensions) {
