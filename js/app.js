@@ -1509,6 +1509,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Populate items
             if (data.items && Array.isArray(data.items)) {
                 let addedCount = 0;
+                let missingDimensionsCount = 0;
                 data.items.forEach(piItem => {
                     if (!piItem.desc || !piItem.qty) return;
                     
@@ -1520,27 +1521,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     const gw = parseFloat(piItem.grossWeight) || 0;
                     const qty = parseInt(piItem.qty, 10) || 1;
                     
-                    if (w > 0 && d > 0 && h > 0) {
-                        currentItems.push({
-                            id: generateId(),
-                            name: piItem.desc,
-                            packageType: 'Pallet', // Default
-                            contentDetails: piItem.remarks || '',
-                            w: w, d: d, h: h,
-                            netWeight: nw, grossWeight: gw, weight: gw,
-                            qty: qty,
-                            stackable: true,
-                            rotation: true
-                        });
-                        addedCount++;
-                    } else {
-                        console.warn(`[적재 시뮬레이터] 상품 '${piItem.desc}'의 가로/세로/높이 정보가 없어 무시됨. (상품 DB 확인 필요)`);
+                    let hasDimensions = (w > 0 && d > 0 && h > 0);
+                    
+                    currentItems.push({
+                        id: generateId(),
+                        name: piItem.desc,
+                        packageType: 'Pallet', // Default
+                        contentDetails: piItem.remarks || '',
+                        w: w, d: d, h: h,
+                        netWeight: nw, grossWeight: gw, weight: gw,
+                        qty: qty,
+                        stackable: true,
+                        rotation: true
+                    });
+                    
+                    if (!hasDimensions) {
+                        missingDimensionsCount++;
                     }
+                    addedCount++;
                 });
+                
                 if (addedCount > 0) {
-                    alert(`견적서에서 ${addedCount}개의 화물을 성공적으로 불러왔습니다! (크기 정보가 없는 항목 제외)`);
+                    if (missingDimensionsCount > 0) {
+                        alert(`견적서에서 ${addedCount}개의 화물을 불러왔습니다.\n\n⚠️ 주의: ${missingDimensionsCount}개의 화물은 규격(가로/세로/높이) 정보가 없습니다. 리스트 우측의 [수정(연필)] 버튼을 눌러 규격을 입력하셔야 시뮬레이션이 가능합니다.`);
+                    } else {
+                        alert(`견적서에서 ${addedCount}개의 화물을 성공적으로 불러왔습니다!`);
+                    }
                 } else {
-                    alert('불러올 수 있는 화물이 없습니다. 상품 DB에 가로/세로/높이 정보가 입력되어 있는지 확인해주세요.');
+                    alert('불러올 수 있는 화물이 없습니다.');
                 }
                 renderItems();
             }
