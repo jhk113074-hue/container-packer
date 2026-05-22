@@ -1508,10 +1508,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Populate containers
             if (data.containers) {
-                if (document.getElementById('cnt_20gp')) document.getElementById('cnt_20gp').value = data.containers['20GP'] || 0;
-                if (document.getElementById('cnt_20rf')) document.getElementById('cnt_20rf').value = data.containers['20RF'] || 0;
-                if (document.getElementById('cnt_40gp')) document.getElementById('cnt_40gp').value = data.containers['40GP'] || 0;
-                if (document.getElementById('cnt_40hc')) document.getElementById('cnt_40hc').value = data.containers['40HC'] || 0;
+                if (document.getElementById('qty-20GP')) document.getElementById('qty-20GP').value = data.containers['20GP'] || 0;
+                if (document.getElementById('qty-20RF')) document.getElementById('qty-20RF').value = data.containers['20RF'] || 0;
+                if (document.getElementById('qty-40GP')) document.getElementById('qty-40GP').value = data.containers['40GP'] || 0;
+                if (document.getElementById('qty-40HC')) document.getElementById('qty-40HC').value = data.containers['40HC'] || 0;
             }
             
             // Populate items
